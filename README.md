@@ -10,7 +10,7 @@ the chunks are built, so the ore layout is visible through stone.
 
 | Component | Version |
 | --- | --- |
-| Minecraft | 26.3 |
+| Minecraft | 26.2 or 26.3 (use the jar built for your version) |
 | Fabric Loader | 0.19.5 or newer |
 | Fabric API | required |
 | Java | 25 or newer |
@@ -20,8 +20,8 @@ installed on the server; it is purely client side.
 
 ## Install
 
-1. Install Fabric Loader for Minecraft 26.3.
-2. Put `fabric-api` and `xray-1.1.0.jar` into `.minecraft/mods`.
+1. Install Fabric Loader for Minecraft 26.2 or 26.3.
+2. Put the matching `fabric-api` and `xray-1.2.0.jar` (built for that Minecraft version) into `.minecraft/mods`.
 3. Start the game, join a world, and press **X** or click the pause menu icon.
 4. The key can be changed in **Options -> Controls -> Key Binds**.
 
@@ -51,13 +51,22 @@ present. `PauseScreenMixin` adds the toggle icon to the pause menu.
 
 ## Build
 
+The default target is Minecraft 26.3. The source also builds against 26.2 by
+overriding the two Fabric properties:
+
 ```bash
 ./build.sh
+# Minecraft 26.2
+./build.sh -Pminecraft_version=26.2 -Pfabric_api_version=0.161.0+26.2
 ```
 
-The jar is written to `build/libs/xray-1.1.0.jar`. A JDK 25 or newer is
-required; `build.sh` finds one automatically on common Linux installations and
-falls back to `JAVA_HOME`.
+The jar is written to `build/libs/xray-1.2.0.jar` and declares a Minecraft
+dependency range that matches the version it was compiled against. A JDK 25 or
+newer is required; `build.sh` finds one automatically on common Linux
+installations and falls back to `JAVA_HOME`.
+
+CI builds both versions as a matrix and verifies the mixin signatures against
+each one.
 
 ## License
 

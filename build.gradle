@@ -6,6 +6,12 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
+// The dependency range is derived from the version that is being built, so a
+// single source tree can produce a jar for each supported Minecraft release.
+def minecraftBase = project.minecraft_version.split('-')[0]
+def minecraftParts = minecraftBase.tokenize('.')
+def minecraftRange = ">=${project.minecraft_version} <${minecraftParts[0]}.${(minecraftParts[1] as int) + 1}"
+
 base {
     archivesName = project.archives_base_name
 }
@@ -22,8 +28,11 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": project.version,
+               "minecraft_version": project.minecraft_version,
+               "minecraft_version_range": minecraftRange
     }
 }
 
