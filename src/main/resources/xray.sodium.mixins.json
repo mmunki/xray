@@ -1,0 +1,11 @@
+{
+    "required": false,
+    "package": "dev.mmunki.xray.mixin",
+    "compatibilityLevel": "JAVA_25",
+    "client": [
+        "SodiumLevelSliceMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 0
+    }
+}

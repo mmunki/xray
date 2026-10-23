@@ -1,0 +1,39 @@
+{
+    "schemaVersion": 1,
+    "id": "xray",
+    "version": "${version}",
+    "name": "X-Ray",
+    "description": "A toggleable client-side X-Ray mod for Fabric. Hides everything except ores, chests, spawners and fluids so you can see the ore layout underground.",
+    "authors": [
+        "mmunki"
+    ],
+    "contact": {
+        "homepage": "https://github.com/mmunki/xray",
+        "sources": "https://github.com/mmunki/xray",
+        "issues": "https://github.com/mmunki/xray/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/xray/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "dev.mmunki.xray.XrayClient"
+        ]
+    },
+    "mixins": [
+        {
+            "config": "xray.mixins.json",
+            "environment": "client"
+        },
+        {
+            "config": "xray.sodium.mixins.json",
+            "environment": "client"
+        }
+    ],
+    "depends": {
+        "fabricloader": ">=0.19.5",
+        "minecraft": ">=26.3 <26.4",
+        "java": ">=25",
+        "fabric-api": "*"
+    }
+}

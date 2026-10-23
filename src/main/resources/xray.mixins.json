@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "package": "dev.mmunki.xray.mixin",
+    "compatibilityLevel": "JAVA_25",
+    "client": [
+        "RenderSectionRegionMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
