@@ -17,3 +17,6 @@ Thumbs.db
 
 # Local run directory
 run/
+
+# Local release output
+dist/

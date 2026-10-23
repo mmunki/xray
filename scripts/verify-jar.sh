@@ -6,10 +6,17 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 expected_version="${1:-}"
+mod_version="$(sed -n 's/^mod_version=//p' gradle.properties)"
 
 jar=""
 if [ -n "$expected_version" ]; then
+    jar="$(ls build/libs/xray-"${mod_version}"+"${expected_version}"*.jar 2>/dev/null | grep -v sources | head -n1 || true)"
+fi
+if [ -z "$jar" ] && [ -n "$expected_version" ]; then
     jar="$(ls build/libs/xray-*"${expected_version}"*.jar 2>/dev/null | grep -v sources | head -n1 || true)"
+fi
+if [ -z "$jar" ]; then
+    jar="$(ls build/libs/xray-"${mod_version}"*.jar 2>/dev/null | grep -v sources | head -n1 || true)"
 fi
 if [ -z "$jar" ]; then
     jar="$(ls build/libs/xray-*.jar | grep -v sources | head -n1)"

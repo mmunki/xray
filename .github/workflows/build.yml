@@ -36,17 +36,28 @@ jobs:
       - name: Build and verify
         run: |
           set -euo pipefail
-          chmod +x build.sh scripts/verify-jar.sh
+          chmod +x build.sh scripts/verify-jar.sh scripts/build-modpack.sh scripts/verify-modpack.sh
           ./build.sh \
             -Pminecraft_version=${{ matrix.minecraft }} \
             -Pfabric_api_version=${{ matrix.fabric_api }}
           bash scripts/verify-jar.sh ${{ matrix.minecraft }}
 
-      - name: Upload the mod jar
+      - name: Build and verify the launcher modpacks
+        run: |
+          set -euo pipefail
+          bash scripts/build-modpack.sh \
+            --minecraft ${{ matrix.minecraft }} \
+            --fabric-api ${{ matrix.fabric_api }}
+          bash scripts/verify-modpack.sh dist/*.mrpack dist/*-curseforge.zip
+
+      - name: Upload the mod jar and modpacks
         uses: actions/upload-artifact@v4
         with:
           name: xray-${{ matrix.minecraft }}
           path: |
             build/libs/xray-*.jar
             !build/libs/*-sources.jar
+            dist/*.mrpack
+            dist/*-curseforge.zip
+            dist/SHA256SUMS-*.txt
           if-no-files-found: error

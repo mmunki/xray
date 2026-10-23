@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.0
+
+- Added launcher-importable modpacks: a Modrinth `.mrpack` and a CurseForge
+  `.zip` for Minecraft 26.2 and 26.3.
+- The packs bundle X-Ray and Fabric API in `overrides/mods` and pin the
+  matching Minecraft and Fabric Loader versions. This makes the release
+  importable in Cubiq Launcher, which rejects a bare mod jar with
+  "This modpack format is not supported".
+- Added `scripts/build-modpack.sh` and `scripts/verify-modpack.sh`; CI now
+  verifies both pack formats for both Minecraft versions.
+- No behaviour change to the mod itself.
+
 ## 1.3.0
 
 - Renamed the Java package from `dev.mmunki.xray` to `tw.mmunki.xray`
