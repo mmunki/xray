@@ -33,10 +33,16 @@ public final class XrayClient implements ClientModInitializer {
             toggled = true;
         }
 
-        if (!toggled) {
-            return;
+        if (toggled) {
+            toggle(client);
         }
+    }
 
+    /**
+     * Toggles X-Ray, shows the action bar message and rebuilds the visible
+     * chunks.  Used by both the key binding and the pause menu button.
+     */
+    public static void toggle(Minecraft client) {
         XrayState state = XrayState.get();
         state.toggle();
 

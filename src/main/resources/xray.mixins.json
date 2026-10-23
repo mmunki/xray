@@ -3,7 +3,8 @@
     "package": "dev.mmunki.xray.mixin",
     "compatibilityLevel": "JAVA_25",
     "client": [
-        "RenderSectionRegionMixin"
+        "RenderSectionRegionMixin",
+        "PauseScreenMixin"
     ],
     "injectors": {
         "defaultRequire": 1

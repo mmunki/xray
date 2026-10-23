@@ -16,10 +16,14 @@ required=(
     xray.sodium.mixins.json
     dev/mmunki/xray/XrayClient.class
     dev/mmunki/xray/XrayState.class
+    dev/mmunki/xray/XrayPauseButton.class
     dev/mmunki/xray/mixin/RenderSectionRegionMixin.class
+    dev/mmunki/xray/mixin/PauseScreenMixin.class
     dev/mmunki/xray/mixin/SodiumLevelSliceMixin.class
     assets/xray/icon.png
     assets/xray/lang/en_us.json
+    assets/xray/textures/gui/xray_icon.png
+    assets/xray/textures/gui/xray_icon_green.png
 )
 
 for entry in "${required[@]}"; do
@@ -46,6 +50,7 @@ assert mod["environment"] == "client", mod["environment"]
 assert "dev.mmunki.xray.XrayClient" in mod["entrypoints"]["client"]
 assert "fabric-api" in mod["depends"], mod["depends"]
 assert "RenderSectionRegionMixin" in vanilla["client"], vanilla
+assert "PauseScreenMixin" in vanilla["client"], vanilla
 assert "SodiumLevelSliceMixin" in sodium["client"], sodium
 print("ok: fabric.mod.json and mixin configs")
 PY
@@ -57,6 +62,10 @@ if [ -n "$minecraft_jar" ]; then
         | grep -q 'getBlockState(net.minecraft.core.BlockPos)' \
         || { echo "error: RenderSectionRegion.getBlockState(BlockPos) not found" >&2; exit 1; }
     echo "ok: RenderSectionRegion.getBlockState(BlockPos)"
+    javap -classpath "$minecraft_jar" -p net.minecraft.client.gui.screens.PauseScreen \
+        | grep -q 'protected void init()' \
+        || { echo "error: PauseScreen.init() not found" >&2; exit 1; }
+    echo "ok: PauseScreen.init()"
 else
     echo "warning: Minecraft jar not found, skipped the signature check" >&2
 fi
