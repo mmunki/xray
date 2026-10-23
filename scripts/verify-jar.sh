@@ -7,7 +7,13 @@ cd "$(dirname "$0")/.."
 
 expected_version="${1:-}"
 
-jar="$(ls build/libs/xray-*.jar | grep -v sources | head -n1)"
+jar=""
+if [ -n "$expected_version" ]; then
+    jar="$(ls build/libs/xray-*"${expected_version}"*.jar 2>/dev/null | grep -v sources | head -n1 || true)"
+fi
+if [ -z "$jar" ]; then
+    jar="$(ls build/libs/xray-*.jar | grep -v sources | head -n1)"
+fi
 [ -f "$jar" ] || { echo "error: built jar not found" >&2; exit 1; }
 
 echo "checking $jar"
@@ -16,12 +22,12 @@ required=(
     fabric.mod.json
     xray.mixins.json
     xray.sodium.mixins.json
-    dev/mmunki/xray/XrayClient.class
-    dev/mmunki/xray/XrayState.class
-    dev/mmunki/xray/XrayPauseButton.class
-    dev/mmunki/xray/mixin/RenderSectionRegionMixin.class
-    dev/mmunki/xray/mixin/PauseScreenMixin.class
-    dev/mmunki/xray/mixin/SodiumLevelSliceMixin.class
+    tw/mmunki/xray/XrayClient.class
+    tw/mmunki/xray/XrayState.class
+    tw/mmunki/xray/XrayPauseButton.class
+    tw/mmunki/xray/mixin/RenderSectionRegionMixin.class
+    tw/mmunki/xray/mixin/PauseScreenMixin.class
+    tw/mmunki/xray/mixin/SodiumLevelSliceMixin.class
     assets/xray/icon.png
     assets/xray/lang/en_us.json
     assets/xray/textures/gui/xray_icon.png
@@ -50,7 +56,7 @@ with zipfile.ZipFile(jar) as zf:
 
 assert mod["id"] == "xray", mod["id"]
 assert mod["environment"] == "client", mod["environment"]
-assert "dev.mmunki.xray.XrayClient" in mod["entrypoints"]["client"]
+assert "tw.mmunki.xray.XrayClient" in mod["entrypoints"]["client"]
 assert "fabric-api" in mod["depends"], mod["depends"]
 if expected:
     parts = expected.split("-")[0].split(".")

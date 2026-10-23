@@ -1,4 +1,4 @@
-package dev.mmunki.xray;
+package tw.mmunki.xray;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;

@@ -47,6 +47,15 @@ java {
 }
 
 jar {
+    manifest {
+        attributes(
+                "Implementation-Title": "X-Ray",
+                "Implementation-Version": project.version,
+                "Implementation-Vendor": "mmunki",
+                "Specification-Title": "X-Ray",
+                "Specification-Version": project.version,
+                "Specification-Vendor": "mmunki")
+    }
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
     }

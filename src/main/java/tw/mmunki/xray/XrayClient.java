@@ -1,4 +1,4 @@
-package dev.mmunki.xray;
+package tw.mmunki.xray;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
