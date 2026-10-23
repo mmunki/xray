@@ -3,7 +3,9 @@ plugins {
     id 'maven-publish'
 }
 
-version = project.mod_version
+// The file name carries the Minecraft version, exactly like a CurseForge
+// file: xray-<mod version>+<minecraft version>.jar.
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 // The dependency range is derived from the version that is being built, so a
@@ -27,10 +29,10 @@ dependencies {
 }
 
 processResources {
-    inputs.property "version", project.version
+    inputs.property "version", project.mod_version
     inputs.property "minecraft_version", project.minecraft_version
     filesMatching("fabric.mod.json") {
-        expand "version": project.version,
+        expand "version": project.mod_version,
                "minecraft_version": project.minecraft_version,
                "minecraft_version_range": minecraftRange
     }
@@ -50,10 +52,10 @@ jar {
     manifest {
         attributes(
                 "Implementation-Title": "X-Ray",
-                "Implementation-Version": project.version,
+                "Implementation-Version": project.mod_version,
                 "Implementation-Vendor": "mmunki",
                 "Specification-Title": "X-Ray",
-                "Specification-Version": project.version,
+                "Specification-Version": project.mod_version,
                 "Specification-Vendor": "mmunki")
     }
     from("LICENSE") {

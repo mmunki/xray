@@ -21,7 +21,7 @@ installed on the server; it is purely client side.
 ## Install
 
 1. Install Fabric Loader for Minecraft 26.2 or 26.3.
-2. Put the matching `fabric-api` and `xray-1.3.0.jar` (built for that Minecraft version) into `.minecraft/mods`.
+2. Put the matching `fabric-api` and `xray-1.3.0+26.2.jar` or `xray-1.3.0+26.3.jar` into `.minecraft/mods`.
 3. Start the game, join a world, and press **X** or click the pause menu icon.
 4. The key can be changed in **Options -> Controls -> Key Binds**.
 
@@ -80,7 +80,8 @@ overriding the two Fabric properties:
 ./build.sh -Pminecraft_version=26.2 -Pfabric_api_version=0.161.0+26.2
 ```
 
-The jar is written to `build/libs/xray-1.3.0.jar` and declares a Minecraft
+The jar is written to `build/libs/xray-1.3.0+26.3.jar` (or
+`xray-1.3.0+26.2.jar` for the 26.2 build) and declares a Minecraft
 dependency range that matches the version it was compiled against. A JDK 25 or
 newer is required; `build.sh` finds one automatically on common Linux
 installations and falls back to `JAVA_HOME`.
