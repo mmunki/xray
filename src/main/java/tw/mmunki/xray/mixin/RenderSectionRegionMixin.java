@@ -8,20 +8,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import tw.mmunki.xray.XrayState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Vanilla chunk meshing reads the blocks through {@code RenderSectionRegion}.
- * Pretending that every block outside the whitelist is air both removes its
- * geometry and stops it from occluding the faces of the blocks we keep, which
- * is what makes the ores visible through stone.
+ * Blocks outside the whitelist are returned as air, which removes their
+ * geometry and stops them from occluding the blocks we keep.  Whitelisted
+ * blocks are returned as glass, so the renderer draws only their outer glass
+ * shell and culls the faces between adjacent glass blocks.
  */
 @Pseudo
 @Mixin(targets = "net.minecraft.client.renderer.chunk.RenderSectionRegion")
 public abstract class RenderSectionRegionMixin {
-    private static final BlockState XRAY_AIR = Blocks.AIR.defaultBlockState();
-
     @Inject(
             method = "getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
             at = @At("RETURN"),
@@ -37,8 +35,6 @@ public abstract class RenderSectionRegionMixin {
             return;
         }
 
-        if (!state.isVisible(blockState)) {
-            cir.setReturnValue(XRAY_AIR);
-        }
+        cir.setReturnValue(state.getRenderState(blockState));
     }
 }

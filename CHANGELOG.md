@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.0
+
+- Fixed `java.lang.NoClassDefFoundError: Could not initialize class
+  tw.mmunki.xray.XrayState`, caused by `INSTANCE` being created before
+  `DEFAULT_WHITELIST`; the whitelist is now populated first and the instance is
+  created afterwards.
+- X-Ray is explicitly off by default; the player has to toggle it on.
+- Whitelisted blocks are rendered as glass. Only the outer glass shell is
+  drawn, because adjacent glass faces are culled, so veins have no interior
+  faces.
+
 ## 1.4.0
 
 - Added launcher-importable modpacks: a Modrinth `.mrpack` and a CurseForge

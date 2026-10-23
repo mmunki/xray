@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import tw.mmunki.xray.XrayState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -19,8 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 @Pseudo
 @Mixin(targets = "net.caffeinemc.mods.sodium.client.world.LevelSlice")
 public abstract class SodiumLevelSliceMixin {
-    private static final BlockState XRAY_AIR = Blocks.AIR.defaultBlockState();
-
     @Inject(
             method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;",
             at = @At("RETURN"),
@@ -50,8 +47,6 @@ public abstract class SodiumLevelSliceMixin {
             return;
         }
 
-        if (!state.isVisible(blockState)) {
-            cir.setReturnValue(XRAY_AIR);
-        }
+        cir.setReturnValue(state.getRenderState(blockState));
     }
 }

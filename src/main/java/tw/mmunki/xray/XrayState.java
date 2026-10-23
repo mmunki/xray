@@ -15,40 +15,53 @@ import net.minecraft.world.level.block.state.BlockState;
  * mod is being initialised, which makes a plain {@link HashSet} safe here.</p>
  */
 public final class XrayState {
-    private static final XrayState INSTANCE = new XrayState();
-
-    private static final Set<Block> DEFAULT_WHITELIST = new HashSet<>();
+    /*
+     * The whitelist has to be populated before INSTANCE is created.  The
+     * constructor copies DEFAULT_WHITELIST, so declaring INSTANCE first (as an
+     * earlier version did) made the copy run while the field was still null and
+     * threw a NullPointerException from HashSet(Collection), which in turn made
+     * the whole class fail with NoClassDefFoundError.
+     */
+    private static final Set<Block> DEFAULT_WHITELIST;
 
     static {
-        DEFAULT_WHITELIST.add(Blocks.COAL_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_COAL_ORE);
-        DEFAULT_WHITELIST.add(Blocks.IRON_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_IRON_ORE);
-        DEFAULT_WHITELIST.add(Blocks.COPPER_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_COPPER_ORE);
-        DEFAULT_WHITELIST.add(Blocks.GOLD_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_GOLD_ORE);
-        DEFAULT_WHITELIST.add(Blocks.REDSTONE_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_REDSTONE_ORE);
-        DEFAULT_WHITELIST.add(Blocks.EMERALD_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_EMERALD_ORE);
-        DEFAULT_WHITELIST.add(Blocks.LAPIS_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_LAPIS_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DIAMOND_ORE);
-        DEFAULT_WHITELIST.add(Blocks.DEEPSLATE_DIAMOND_ORE);
-        DEFAULT_WHITELIST.add(Blocks.NETHER_GOLD_ORE);
-        DEFAULT_WHITELIST.add(Blocks.NETHER_QUARTZ_ORE);
-        DEFAULT_WHITELIST.add(Blocks.ANCIENT_DEBRIS);
-        DEFAULT_WHITELIST.add(Blocks.BUDDING_AMETHYST);
-        DEFAULT_WHITELIST.add(Blocks.CHEST);
-        DEFAULT_WHITELIST.add(Blocks.TRAPPED_CHEST);
-        DEFAULT_WHITELIST.add(Blocks.SPAWNER);
-        DEFAULT_WHITELIST.add(Blocks.TRIAL_SPAWNER);
-        DEFAULT_WHITELIST.add(Blocks.WATER);
-        DEFAULT_WHITELIST.add(Blocks.LAVA);
+        Set<Block> blocks = new HashSet<>();
+        blocks.add(Blocks.COAL_ORE);
+        blocks.add(Blocks.DEEPSLATE_COAL_ORE);
+        blocks.add(Blocks.IRON_ORE);
+        blocks.add(Blocks.DEEPSLATE_IRON_ORE);
+        blocks.add(Blocks.COPPER_ORE);
+        blocks.add(Blocks.DEEPSLATE_COPPER_ORE);
+        blocks.add(Blocks.GOLD_ORE);
+        blocks.add(Blocks.DEEPSLATE_GOLD_ORE);
+        blocks.add(Blocks.REDSTONE_ORE);
+        blocks.add(Blocks.DEEPSLATE_REDSTONE_ORE);
+        blocks.add(Blocks.EMERALD_ORE);
+        blocks.add(Blocks.DEEPSLATE_EMERALD_ORE);
+        blocks.add(Blocks.LAPIS_ORE);
+        blocks.add(Blocks.DEEPSLATE_LAPIS_ORE);
+        blocks.add(Blocks.DIAMOND_ORE);
+        blocks.add(Blocks.DEEPSLATE_DIAMOND_ORE);
+        blocks.add(Blocks.NETHER_GOLD_ORE);
+        blocks.add(Blocks.NETHER_QUARTZ_ORE);
+        blocks.add(Blocks.ANCIENT_DEBRIS);
+        blocks.add(Blocks.BUDDING_AMETHYST);
+        blocks.add(Blocks.CHEST);
+        blocks.add(Blocks.TRAPPED_CHEST);
+        blocks.add(Blocks.SPAWNER);
+        blocks.add(Blocks.TRIAL_SPAWNER);
+        blocks.add(Blocks.WATER);
+        blocks.add(Blocks.LAVA);
+        DEFAULT_WHITELIST = Set.copyOf(blocks);
     }
 
-    private volatile boolean active;
+    private static final XrayState INSTANCE = new XrayState();
+
+    private static final BlockState GLASS = Blocks.GLASS.defaultBlockState();
+    private static final BlockState AIR = Blocks.AIR.defaultBlockState();
+
+    /** X-Ray is off by default; the player has to enable it explicitly. */
+    private volatile boolean active = false;
     private final Set<Block> whitelist = new HashSet<>(DEFAULT_WHITELIST);
 
     private XrayState() {
@@ -67,11 +80,26 @@ public final class XrayState {
     }
 
     /**
-     * @return {@code true} when the block should still be rendered while X-Ray
-     *         is active.
+     * @return {@code true} when the block belongs to the ore/container whitelist.
      */
     public boolean isVisible(BlockState state) {
         return whitelist.contains(state.getBlock());
+    }
+
+    /**
+     * The block state that the chunk renderer has to use for the given world
+     * block while X-Ray is active.
+     *
+     * <p>Whitelisted blocks are replaced by glass, so only their outer glass
+     * shell is drawn; the faces shared by adjacent glass blocks are culled by
+     * the renderer, which removes the interior.  Everything else becomes air,
+     * which also stops it from occluding the glass outlines.</p>
+     */
+    public BlockState getRenderState(BlockState state) {
+        if (whitelist.contains(state.getBlock())) {
+            return GLASS;
+        }
+        return AIR;
     }
 
     public Set<Block> getWhitelist() {
