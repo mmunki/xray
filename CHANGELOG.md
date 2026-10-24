@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.0
+
+- The pause menu no longer shows the wide **Minecraft X** text button. It now
+  shows only a small **X** button in the top-right corner. The X is white while
+  X-Ray is off and turns green while X-Ray is on; tapping it again restores
+  the normal white X.
+- The mod logo is now a pixel-art diamond pickaxe, like a Minecraft item,
+  instead of the lit X on a stone background.
+
 ## 1.6.1
 
 - Fixed the startup crash `Could not execute entrypoint stage 'main' ... Block id

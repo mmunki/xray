@@ -56,6 +56,25 @@ for entry in "${required[@]}"; do
     echo "ok: $entry"
 done
 
+python3 - "$jar" <<'PY'
+import struct
+import sys
+import zipfile
+
+expected = {
+    "assets/xray/icon.png": (128, 128),
+    "assets/xray/textures/gui/xray_icon.png": (16, 16),
+    "assets/xray/textures/gui/xray_icon_green.png": (16, 16),
+}
+with zipfile.ZipFile(sys.argv[1]) as zf:
+    for name, size in expected.items():
+        data = zf.read(name)
+        assert data[:8] == b"\x89PNG\r\n\x1a\n", name
+        width, height = struct.unpack(">II", data[16:24])
+        assert (width, height) == size, (name, width, height, size)
+print("ok: mod icon and pause-button icon sizes")
+PY
+
 for entrypoint in XrayClient XrayBlocks XrayModMenu; do
     if ! javap -classpath "$jar" -p "tw.mmunki.xray.$entrypoint" \
             | grep -q "public tw.mmunki.xray.$entrypoint();"; then

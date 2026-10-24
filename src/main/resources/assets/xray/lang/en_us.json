@@ -2,7 +2,7 @@
     "key.xray.toggle": "Toggle X-Ray",
     "xray.toggle.on": "X-Ray enabled",
     "xray.toggle.off": "X-Ray disabled",
-    "xray.button": "Minecraft X",
+    "xray.button": "Toggle X-Ray",
     "xray.button.tooltip": "Toggle X-Ray (X)",
     "xray.config.title": "X-Ray Settings",
     "xray.config.enabled": "X-Ray: %s",
