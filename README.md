@@ -24,7 +24,7 @@ installed on the server; it is purely client side.
 ## Install
 
 1. Install Fabric Loader for Minecraft 26.2 or 26.3.
-2. Put the matching `fabric-api` and `xray-1.6.0+26.2.jar` or `xray-1.6.0+26.3.jar` into `.minecraft/mods`.
+2. Put the matching `fabric-api` and `xray-1.6.1+26.2.jar` or `xray-1.6.1+26.3.jar` into `.minecraft/mods`.
 3. Start the game, join a world, and press **X** or click the **Minecraft X**
    button in the pause menu. Install [Mod Menu](https://modrinth.com/mod/modmenu)
    as well to open the settings from the mod list.
@@ -37,11 +37,11 @@ text button.
 
 ## Cubiq / launcher import
 
-Cubiq imports **modpacks**, not bare mod jars. Selecting `xray-1.6.0+*.jar`
+Cubiq imports **modpacks**, not bare mod jars. Selecting `xray-1.6.1+*.jar`
 in **Import Modpack** is what produces `This modpack format is not supported.`
 Use the matching Modrinth pack instead:
 
-1. Download `xray-1.6.0+26.2.mrpack` or `xray-1.6.0+26.3.mrpack` from the
+1. Download `xray-1.6.1+26.2.mrpack` or `xray-1.6.1+26.3.mrpack` from the
    release.
 2. In Cubiq, choose **Import Modpack** and select the `.mrpack`.
 3. Start the imported instance and press **X** or use the **Minecraft X**
@@ -49,7 +49,7 @@ Use the matching Modrinth pack instead:
 
 The pack bundles X-Ray, Fabric API and Mod Menu under `overrides/mods`, and
 pins the matching Minecraft and Fabric Loader versions, so no separate
-download is needed. A CurseForge-format zip (`xray-1.6.0+<version>-curseforge.zip`) is
+download is needed. A CurseForge-format zip (`xray-1.6.1+<version>-curseforge.zip`) is
 published for launchers that prefer that format.
 
 ## CurseForge
@@ -65,7 +65,7 @@ The release is laid out exactly like a CurseForge file upload:
 | Game versions | 26.2, 26.3 |
 | Java version | Java 25 |
 | Release type | release |
-| Files | `xray-1.6.0+26.2.jar`, `xray-1.6.0+26.3.jar` |
+| Files | `xray-1.6.1+26.2.jar`, `xray-1.6.1+26.3.jar` |
 | Changelog | `CHANGELOG.md` |
 | License | MIT (also inside the jar) |
 
@@ -110,8 +110,8 @@ overriding the two Fabric properties:
 ./build.sh -Pminecraft_version=26.2 -Pfabric_api_version=0.161.0+26.2
 ```
 
-The jar is written to `build/libs/xray-1.6.0+26.3.jar` (or
-`xray-1.6.0+26.2.jar` for the 26.2 build) and declares a Minecraft
+The jar is written to `build/libs/xray-1.6.1+26.3.jar` (or
+`xray-1.6.1+26.2.jar` for the 26.2 build) and declares a Minecraft
 dependency range that matches the version it was compiled against. A JDK 25 or
 newer is required; `build.sh` finds one automatically on common Linux
 installations and falls back to `JAVA_HOME`.
@@ -121,8 +121,8 @@ To build the launcher-importable packs after the jars exist:
 ```bash
 ./build.sh
 scripts/build-modpack.sh --minecraft 26.3 --fabric-api 0.165.0+26.3
-scripts/verify-modpack.sh dist/xray-1.6.0+26.3.mrpack \
-    dist/xray-1.6.0+26.3-curseforge.zip
+scripts/verify-modpack.sh dist/xray-1.6.1+26.3.mrpack \
+    dist/xray-1.6.1+26.3-curseforge.zip
 ```
 
 The `.mrpack` and CurseForge `.zip` are written to `dist/` (never committed).

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1
+
+- Fixed the startup crash `Could not execute entrypoint stage 'main' ... Block id
+  not set` (`NullPointerException` in `BlockBehaviour$Properties.effectiveDrops`).
+  The overlay block is now created with an explicit registry id
+  (`xray:overlay`) before registration, and it has no loot table.
+
 ## 1.6.0
 
 - Ores, chests, spawners and fluids now render with their normal textures

@@ -3,7 +3,9 @@ package tw.mmunki.xray;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TransparentBlock;
@@ -17,8 +19,14 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
  * exists purely as a render state for the chunk mesher.</p>
  */
 public final class XrayBlocks implements ModInitializer {
+    private static final ResourceKey<Block> OVERLAY_ID = ResourceKey.create(
+            Registries.BLOCK,
+            Identifier.fromNamespaceAndPath(XrayClient.MOD_ID, "overlay"));
+
     public static final Block OVERLAY = new OverlayBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS));
+            BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS)
+                    .noLootTable()
+                    .setId(OVERLAY_ID));
 
     private static boolean registered;
 
@@ -32,8 +40,7 @@ public final class XrayBlocks implements ModInitializer {
             return;
         }
         registered = true;
-        Registry.register(BuiltInRegistries.BLOCK,
-                Identifier.fromNamespaceAndPath(XrayClient.MOD_ID, "overlay"), OVERLAY);
+        Registry.register(BuiltInRegistries.BLOCK, OVERLAY_ID, OVERLAY);
     }
 
     private static final class OverlayBlock extends TransparentBlock {
