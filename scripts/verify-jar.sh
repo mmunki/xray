@@ -56,6 +56,15 @@ for entry in "${required[@]}"; do
     echo "ok: $entry"
 done
 
+for entrypoint in XrayClient XrayBlocks XrayModMenu; do
+    if ! javap -classpath "$jar" -p "tw.mmunki.xray.$entrypoint" \
+            | grep -q "public tw.mmunki.xray.$entrypoint();"; then
+        echo "error: $entrypoint needs a public no-arg constructor" >&2
+        exit 1
+    fi
+    echo "ok: $entrypoint public no-arg constructor"
+done
+
 python3 - "$jar" "$expected_version" <<'PY'
 import json
 import sys
