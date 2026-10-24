@@ -3,7 +3,7 @@
     "id": "xray",
     "version": "${version}",
     "name": "X-Ray",
-    "description": "A toggleable client-side X-Ray mod for Fabric. Hides everything except ores, chests, spawners and fluids so you can see the ore layout underground.",
+    "description": "A toggleable client-side X-Ray mod for Fabric. Ores, chests, spawners and fluids stay visible while every other block is drawn as 25% glass.",
     "authors": [
         "mmunki"
     ],
@@ -18,6 +18,12 @@
     "entrypoints": {
         "client": [
             "tw.mmunki.xray.XrayClient"
+        ],
+        "modmenu": [
+            "tw.mmunki.xray.XrayModMenu"
+        ],
+        "main": [
+            "tw.mmunki.xray.XrayBlocks"
         ]
     },
     "mixins": [
@@ -35,5 +41,8 @@
         "minecraft": "${minecraft_version_range}",
         "java": ">=25",
         "fabric-api": "*"
+    },
+    "suggests": {
+        "modmenu": ">=20.0.0"
     }
 }

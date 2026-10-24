@@ -2,8 +2,8 @@
 # Build launcher-importable modpacks from an already built X-Ray jar.
 #
 # Cubiq (and most other launchers) import modpacks, not bare mod jars.  This
-# script produces a Modrinth .mrpack and a CurseForge .zip that contain both
-# X-Ray and Fabric API under overrides/mods, so the imported instance starts
+# script produces a Modrinth .mrpack and a CurseForge .zip that contain X-Ray,
+# Fabric API and Mod Menu under overrides/mods, so the imported instance starts
 # with everything it needs.
 set -euo pipefail
 
@@ -15,6 +15,7 @@ usage: scripts/build-modpack.sh --minecraft VERSION --fabric-api VERSION [option
 
   --minecraft VERSION    Minecraft version of the built jar (required)
   --fabric-api VERSION   Fabric API version to bundle, e.g. 0.165.0+26.3 (required)
+  --modmenu VERSION      Mod Menu version to bundle (default: 20.0.3 for 26.2, 21.0.0 otherwise)
   --loader VERSION       Fabric Loader version (default: loader_version in gradle.properties)
   --jar FILE             mod jar to package (default: build/libs/xray-<mod>+<minecraft>.jar)
   --out DIR              output directory (default: dist)
@@ -23,6 +24,7 @@ USAGE
 
 minecraft_version=""
 fabric_api_version=""
+modmenu_version=""
 loader_version="$(sed -n 's/^loader_version=//p' gradle.properties)"
 mod_version="$(sed -n 's/^mod_version=//p' gradle.properties)"
 jar=""
@@ -32,6 +34,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --minecraft) minecraft_version="${2:?missing value for $1}"; shift 2 ;;
         --fabric-api) fabric_api_version="${2:?missing value for $1}"; shift 2 ;;
+        --modmenu) modmenu_version="${2:?missing value for $1}"; shift 2 ;;
         --loader) loader_version="${2:?missing value for $1}"; shift 2 ;;
         --jar) jar="${2:?missing value for $1}"; shift 2 ;;
         --out) out_dir="${2:?missing value for $1}"; shift 2 ;;
@@ -42,6 +45,12 @@ done
 
 [ -n "$minecraft_version" ] || { echo "error: --minecraft is required" >&2; exit 2; }
 [ -n "$fabric_api_version" ] || { echo "error: --fabric-api is required" >&2; exit 2; }
+if [ -z "$modmenu_version" ]; then
+    case "$minecraft_version" in
+        26.2) modmenu_version="20.0.3" ;;
+        *) modmenu_version="21.0.0" ;;
+    esac
+fi
 [ -n "$loader_version" ] || { echo "error: loader_version is empty" >&2; exit 2; }
 [ -n "$mod_version" ] || { echo "error: mod_version is empty" >&2; exit 2; }
 
@@ -66,6 +75,15 @@ if [ ! -f "$fabric_api_jar" ]; then
 fi
 fabric_api_jar_name="$(basename "$fabric_api_jar")"
 
+modmenu_jar="${cache_dir}/modmenu-${modmenu_version}.jar"
+if [ ! -f "$modmenu_jar" ]; then
+    url="https://maven.terraformersmc.com/releases/com/terraformersmc/modmenu/${modmenu_version}/modmenu-${modmenu_version}.jar"
+    echo "downloading ${url}"
+    curl -fL --retry 3 --retry-delay 2 -o "${modmenu_jar}.tmp" "$url"
+    mv "${modmenu_jar}.tmp" "$modmenu_jar"
+fi
+modmenu_jar_name="$(basename "$modmenu_jar")"
+
 work_dir="build/modpack/${minecraft_version}"
 rm -rf "$work_dir"
 mkdir -p "$work_dir/modrinth/overrides/mods" "$work_dir/curseforge/overrides/mods"
@@ -73,6 +91,7 @@ mkdir -p "$work_dir/modrinth/overrides/mods" "$work_dir/curseforge/overrides/mod
 for pack in modrinth curseforge; do
     cp "$jar" "$work_dir/$pack/overrides/mods/$jar_name"
     cp "$fabric_api_jar" "$work_dir/$pack/overrides/mods/$fabric_api_jar_name"
+    cp "$modmenu_jar" "$work_dir/$pack/overrides/mods/$modmenu_jar_name"
 done
 
 cat > "$work_dir/modrinth/modrinth.index.json" <<JSON
@@ -81,7 +100,7 @@ cat > "$work_dir/modrinth/modrinth.index.json" <<JSON
   "game": "minecraft",
   "versionId": "${mod_version}+${minecraft_version}",
   "name": "X-Ray ${mod_version} (${minecraft_version})",
-  "summary": "Client-side X-Ray for Minecraft ${minecraft_version} on Fabric. X-Ray and Fabric API are bundled in overrides/mods.",
+  "summary": "Client-side X-Ray for Minecraft ${minecraft_version} on Fabric. X-Ray, Fabric API and Mod Menu are bundled in overrides/mods.",
   "files": [],
   "dependencies": {
     "minecraft": "${minecraft_version}",

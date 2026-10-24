@@ -32,11 +32,18 @@ required=(
     tw/mmunki/xray/XrayClient.class
     tw/mmunki/xray/XrayState.class
     tw/mmunki/xray/XrayPauseButton.class
+    tw/mmunki/xray/XrayConfig.class
+    tw/mmunki/xray/XrayConfigScreen.class
+    tw/mmunki/xray/XrayModMenu.class
+    tw/mmunki/xray/XrayBlocks.class
     tw/mmunki/xray/mixin/RenderSectionRegionMixin.class
     tw/mmunki/xray/mixin/PauseScreenMixin.class
     tw/mmunki/xray/mixin/SodiumLevelSliceMixin.class
     assets/xray/icon.png
     assets/xray/lang/en_us.json
+    assets/xray/blockstates/overlay.json
+    assets/xray/models/block/overlay.json
+    assets/xray/textures/block/overlay.png
     assets/xray/textures/gui/xray_icon.png
     assets/xray/textures/gui/xray_icon_green.png
 )
@@ -64,7 +71,10 @@ with zipfile.ZipFile(jar) as zf:
 assert mod["id"] == "xray", mod["id"]
 assert mod["environment"] == "client", mod["environment"]
 assert "tw.mmunki.xray.XrayClient" in mod["entrypoints"]["client"]
+assert "tw.mmunki.xray.XrayBlocks" in mod["entrypoints"]["main"]
+assert "tw.mmunki.xray.XrayModMenu" in mod["entrypoints"]["modmenu"]
 assert "fabric-api" in mod["depends"], mod["depends"]
+assert "modmenu" in mod["suggests"], mod["suggests"]
 if expected:
     parts = expected.split("-")[0].split(".")
     wanted = f">={expected} <{parts[0]}.{int(parts[1]) + 1}"
@@ -88,11 +98,15 @@ if [ -n "$minecraft_jar" ]; then
     javap -classpath "$minecraft_jar" -p net.minecraft.client.renderer.chunk.RenderSectionRegion \
         | grep -q 'getBlockState(net.minecraft.core.BlockPos)' \
         || { echo "error: RenderSectionRegion.getBlockState(BlockPos) not found" >&2; exit 1; }
+    javap -classpath "$minecraft_jar" -p net.minecraft.client.renderer.chunk.RenderSectionRegion \
+        | grep -q 'getFluidState(net.minecraft.core.BlockPos)' \
+        || { echo "error: RenderSectionRegion.getFluidState(BlockPos) not found" >&2; exit 1; }
     echo "ok: RenderSectionRegion.getBlockState(BlockPos)"
+    echo "ok: RenderSectionRegion.getFluidState(BlockPos)"
     javap -classpath "$minecraft_jar" -p net.minecraft.client.gui.screens.PauseScreen \
-        | grep -q 'protected void init()' \
-        || { echo "error: PauseScreen.init() not found" >&2; exit 1; }
-    echo "ok: PauseScreen.init()"
+        | grep -q 'private void createPauseMenu()' \
+        || { echo "error: PauseScreen.createPauseMenu() not found" >&2; exit 1; }
+    echo "ok: PauseScreen.createPauseMenu()"
 else
     echo "warning: Minecraft jar not found, skipped the signature check" >&2
 fi

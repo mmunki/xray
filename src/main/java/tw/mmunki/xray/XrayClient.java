@@ -23,6 +23,10 @@ public final class XrayClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        XrayBlocks.init();
+        XrayConfig.load();
+        XrayState.get().initFromConfig();
+
         KeyMappingHelper.registerKeyMapping(TOGGLE);
         ClientTickEvents.END_CLIENT_TICK.register(XrayClient::onEndClientTick);
     }
@@ -40,19 +44,30 @@ public final class XrayClient implements ClientModInitializer {
 
     /**
      * Toggles X-Ray, shows the action bar message and rebuilds the visible
-     * chunks.  Used by both the key binding and the pause menu button.
+     * chunks.  Used by the key binding, the pause menu button and the settings
+     * screen.
      */
     public static void toggle(Minecraft client) {
+        setActive(client, !XrayState.get().isActive());
+    }
+
+    /** Enables or disables X-Ray and refreshes the rendered chunks. */
+    public static void setActive(Minecraft client, boolean active) {
         XrayState state = XrayState.get();
-        state.toggle();
+        state.setActive(active);
 
         if (client.player != null) {
-            Component message = Component.translatable(state.isActive() ? "xray.toggle.on" : "xray.toggle.off")
-                    .withStyle(state.isActive() ? ChatFormatting.GREEN : ChatFormatting.RED);
+            Component message = Component.translatable(active ? "xray.toggle.on" : "xray.toggle.off")
+                    .withStyle(active ? ChatFormatting.GREEN : ChatFormatting.RED);
             client.player.sendOverlayMessage(message);
         }
 
-        if (client.level != null) {
+        refreshChunks(client);
+    }
+
+    /** Rebuilds the chunks after a setting changed, but only while active. */
+    public static void refreshChunks(Minecraft client) {
+        if (XrayState.get().isActive()) {
             rebuildChunks(client);
         }
     }

@@ -26,9 +26,11 @@ with zipfile.ZipFile(pack) as zf:
 
     mod_jars = [n for n in names if n.startswith("overrides/mods/xray-") and n.endswith(".jar")]
     api_jars = [n for n in names if n.startswith("overrides/mods/fabric-api-") and n.endswith(".jar")]
+    modmenu_jars = [n for n in names if n.startswith("overrides/mods/modmenu-") and n.endswith(".jar")]
     assert len(mod_jars) == 1, f"expected one X-Ray jar, got {mod_jars}"
     assert f"xray-{mod_version}" in mod_jars[0], mod_jars[0]
     assert len(api_jars) == 1, f"expected one Fabric API jar, got {api_jars}"
+    assert len(modmenu_jars) == 1, f"expected one Mod Menu jar, got {modmenu_jars}"
 
     if "modrinth.index.json" in names:
         index = json.loads(zf.read("modrinth.index.json"))

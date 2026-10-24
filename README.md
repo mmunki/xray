@@ -2,11 +2,11 @@
 
 A small, client-side X-Ray mod for Minecraft Fabric. X-Ray starts
 **switched off**. Press **X** to toggle it on and off, or open the pause menu
-and click the X-Ray icon in the top-right corner. The icon is drawn in green
-while X-Ray is active. While it is on, everything except ores, chests,
-spawners and fluids is treated as air while the chunks are built. The blocks
-that remain are drawn as glass: only their outer glass shell is rendered, the
-faces between adjacent glass blocks are culled, so the interior is not drawn.
+and click the green **Minecraft X** button. While it is on, ores, chests,
+spawners and fluids are shown exactly as they look in the world, and every
+other block is drawn as a 25%-opaque glass overlay. The overlay is a full
+cube, but the faces between two adjacent overlay blocks are culled, so only
+the outer shell of the terrain is drawn.
 
 ## Requirements
 
@@ -15,6 +15,7 @@ faces between adjacent glass blocks are culled, so the interior is not drawn.
 | Minecraft | 26.2 or 26.3 (use the jar built for your version) |
 | Fabric Loader | 0.19.5 or newer |
 | Fabric API | required |
+| Mod Menu | optional; bundled in the launcher packs |
 | Java | 25 or newer |
 
 Sodium is supported when it is installed. The mod does not need to be
@@ -23,29 +24,32 @@ installed on the server; it is purely client side.
 ## Install
 
 1. Install Fabric Loader for Minecraft 26.2 or 26.3.
-2. Put the matching `fabric-api` and `xray-1.5.0+26.2.jar` or `xray-1.5.0+26.3.jar` into `.minecraft/mods`.
-3. Start the game, join a world, and press **X** or click the pause menu icon.
+2. Put the matching `fabric-api` and `xray-1.6.0+26.2.jar` or `xray-1.6.0+26.3.jar` into `.minecraft/mods`.
+3. Start the game, join a world, and press **X** or click the **Minecraft X**
+   button in the pause menu. Install [Mod Menu](https://modrinth.com/mod/modmenu)
+   as well to open the settings from the mod list.
 4. The key can be changed in **Options -> Controls -> Key Binds**.
 
 The action bar shows `X-Ray enabled` / `X-Ray disabled` after a toggle, and the
 chunks around the player are rebuilt immediately so the change is visible
-without moving. The pause menu button shows the same state: the icon is green
-while X-Ray is active.
+without moving. The pause menu button is always a bold green **Minecraft X**
+text button.
 
 ## Cubiq / launcher import
 
-Cubiq imports **modpacks**, not bare mod jars. Selecting `xray-1.5.0+*.jar`
+Cubiq imports **modpacks**, not bare mod jars. Selecting `xray-1.6.0+*.jar`
 in **Import Modpack** is what produces `This modpack format is not supported.`
 Use the matching Modrinth pack instead:
 
-1. Download `xray-1.5.0+26.2.mrpack` or `xray-1.5.0+26.3.mrpack` from the
+1. Download `xray-1.6.0+26.2.mrpack` or `xray-1.6.0+26.3.mrpack` from the
    release.
 2. In Cubiq, choose **Import Modpack** and select the `.mrpack`.
-3. Start the imported instance and press **X** or use the pause-menu icon.
+3. Start the imported instance and press **X** or use the **Minecraft X**
+   button in the pause menu.
 
-The pack bundles both X-Ray and Fabric API under `overrides/mods`, and pins the
-matching Minecraft and Fabric Loader versions, so no separate download is
-needed. A CurseForge-format zip (`xray-1.5.0+<version>-curseforge.zip`) is
+The pack bundles X-Ray, Fabric API and Mod Menu under `overrides/mods`, and
+pins the matching Minecraft and Fabric Loader versions, so no separate
+download is needed. A CurseForge-format zip (`xray-1.6.0+<version>-curseforge.zip`) is
 published for launchers that prefer that format.
 
 ## CurseForge
@@ -61,7 +65,7 @@ The release is laid out exactly like a CurseForge file upload:
 | Game versions | 26.2, 26.3 |
 | Java version | Java 25 |
 | Release type | release |
-| Files | `xray-1.5.0+26.2.jar`, `xray-1.5.0+26.3.jar` |
+| Files | `xray-1.6.0+26.2.jar`, `xray-1.6.0+26.3.jar` |
 | Changelog | `CHANGELOG.md` |
 | License | MIT (also inside the jar) |
 
@@ -76,22 +80,24 @@ lapis, deepslate lapis, diamond, deepslate diamond, nether gold, nether
 quartz, ancient debris, budding amethyst, chests, trapped chests, spawners,
 trial spawners, water and lava.
 
-Each of these is rendered as a glass block. Minecraft culls the faces shared
-by two adjacent glass blocks, so a vein is shown as a hollow glass outline and
-its interior faces are not drawn. The whitelist lives in
-`src/main/java/tw/mmunki/xray/XrayState.java`.
+These blocks are returned unchanged, so they are rendered with their normal
+textures. Every other block is replaced by `xray:overlay`, a glass-like full
+cube whose texture is 25% opaque. Minecraft culls the faces shared by two
+adjacent overlay blocks, so the terrain is drawn as a faint outer shell rather
+than a solid wall. The categories live in
+`src/main/java/tw/mmunki/xray/XrayState.java` and can be switched on and off
+in the Mod Menu settings screen.
 
 ## How it works
 
 `RenderSectionRegionMixin` intercepts `getBlockState` on the vanilla chunk
-renderer, returns `air` for blocks outside the whitelist and glass for the
-whitelisted blocks. Air removes the hidden geometry and stops it from
-occluding the glass; glass gives the visible blocks their transparent outline,
-and the renderer culls the shared faces inside a glass vein.
-`SodiumLevelSliceMixin` does the same for Sodium's `LevelSlice`; it is optional
-and only applies when Sodium is present. `PauseScreenMixin` adds the toggle
-icon to the pause menu. `XrayState` starts with `active = false`, so the mod is
-off on every launch until the player enables it.
+renderer, returns the original state for whitelisted blocks and the 25% glass
+overlay for everything else. `SodiumLevelSliceMixin` does the same for
+Sodium's `LevelSlice`; it is optional and only applies when Sodium is present.
+`PauseScreenMixin` adds the **Minecraft X** button to the pause menu grid.
+`XrayModMenu` provides the settings screen when Mod Menu is installed, and
+`XrayConfig` stores the settings in `config/xray.json`. X-Ray is off on every
+launch unless **Enable at startup** is switched on.
 
 ## Build
 
@@ -104,8 +110,8 @@ overriding the two Fabric properties:
 ./build.sh -Pminecraft_version=26.2 -Pfabric_api_version=0.161.0+26.2
 ```
 
-The jar is written to `build/libs/xray-1.5.0+26.3.jar` (or
-`xray-1.5.0+26.2.jar` for the 26.2 build) and declares a Minecraft
+The jar is written to `build/libs/xray-1.6.0+26.3.jar` (or
+`xray-1.6.0+26.2.jar` for the 26.2 build) and declares a Minecraft
 dependency range that matches the version it was compiled against. A JDK 25 or
 newer is required; `build.sh` finds one automatically on common Linux
 installations and falls back to `JAVA_HOME`.
@@ -115,13 +121,14 @@ To build the launcher-importable packs after the jars exist:
 ```bash
 ./build.sh
 scripts/build-modpack.sh --minecraft 26.3 --fabric-api 0.165.0+26.3
-scripts/verify-modpack.sh dist/xray-1.5.0+26.3.mrpack \
-    dist/xray-1.5.0+26.3-curseforge.zip
+scripts/verify-modpack.sh dist/xray-1.6.0+26.3.mrpack \
+    dist/xray-1.6.0+26.3-curseforge.zip
 ```
 
 The `.mrpack` and CurseForge `.zip` are written to `dist/` (never committed).
-The script downloads the matching Fabric API jar from the Fabric maven and
-bundles it with X-Ray in `overrides/mods`.
+The script downloads the matching Fabric API jar from the Fabric maven and the
+matching Mod Menu jar from the Terraformers maven, then bundles both with
+X-Ray in `overrides/mods`.
 
 CI builds both versions as a matrix, verifies the mixin signatures against
 each one, and verifies the generated packs.

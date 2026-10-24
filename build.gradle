@@ -19,13 +19,23 @@ base {
 }
 
 repositories {
+    maven {
+        name = 'Terraformers'
+        url = 'https://maven.terraformersmc.com/releases/'
+    }
     mavenCentral()
 }
+
+// Mod Menu is optional; the version has to match the Minecraft version that
+// is being built.  Override with -Pmodmenu_version=... when needed.
+def modmenuVersion = project.findProperty('modmenu_version') ?: (
+        project.minecraft_version.startsWith('26.2') ? '20.0.3' : '21.0.0')
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    compileOnly "com.terraformersmc:modmenu:${modmenuVersion}"
 }
 
 processResources {
